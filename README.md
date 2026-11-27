@@ -92,17 +92,6 @@ git clone https://github.com/justincheriyantiju-glitch/datascope-analytics.git
 
 No installation or server is needed. Excel support loads the SheetJS library from a CDN, so it needs an internet connection the first time. CSV and JSON files work without one, apart from Excel export.
 
-## Publish as a website (GitHub Pages)
-
-1. Push `index.html`, `README.md` and the `assets` folder to the `main` branch of the repository.
-2. On GitHub, open **Settings → Pages**.
-3. Under **Build and deployment**, set **Source** to **Deploy from a branch**, choose `main` and the `/ (root)` folder, then click **Save**.
-4. After a minute or two the site is live at:
-
-   **https://justincheriyantiju-glitch.github.io/datascope-analytics/**
-
-The file must be named `index.html` and sit in the root of the repository for the site to load.
-
 ## Project structure
 
 ```
