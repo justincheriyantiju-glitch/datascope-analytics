@@ -14,6 +14,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 button,input,select{font:inherit}button,label{cursor:pointer}
 .wrap{max-width:1100px;margin:auto;padding:16px}
 header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px}.logo{width:44px;height:44px;object-fit:contain}.flogo{width:36px;height:36px;display:block;margin:0 auto 6px}
 .brand b{font-size:19px;letter-spacing:1.5px}.brand b span{color:var(--saf)}.brand small{display:block;color:var(--mut);font-size:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;min-width:0}
 .btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:10px 14px;font-weight:650;font-size:14px;display:inline-block}
@@ -53,7 +54,7 @@ footer{color:var(--mut);font-size:12px;padding:14px 0}
 </head>
 <body>
 <div class="wrap">
-<header><div class="brand"><b>DATA<span>SCOPE</span></b><small>Ledger &amp; bank statement workings for accountants and CAs</small></div><button class="btn" id="sample">Try sample data</button></header>
+<header><div class="brand"><img class="logo" src="assets/logo.png" alt="DATASCOPE logo" onerror="this.style.display='none'"><div><b>DATA<span>SCOPE</span></b><small>Ledger &amp; bank statement workings for accountants and CAs</small></div></div><button class="btn" id="sample">Try sample data</button></header>
 
 <section class="card up" id="drop">
  <h1>Bank statement &amp; ledger workings, in seconds</h1>
@@ -101,7 +102,7 @@ footer{color:var(--mut);font-size:12px;padding:14px 0}
 
  <section class="panel" id="t-chk"><div class="card" id="chk"></div></section>
 </main>
-<footer>DataScope · Your file is never uploaded. Excel support loads one library from the internet. Always check totals against your books.</footer>
+<footer style="text-align:center"><img class="flogo" src="assets/logo.png" alt="DATASCOPE logo" onerror="this.style.display='none'">DataScope · Your file is never uploaded. Excel support loads one library from the internet. Always check totals against your books.</footer>
 </div>
 
 <script>
