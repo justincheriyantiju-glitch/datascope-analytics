@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DataScope — Money Dashboard for Indian Businesses</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f6faf8;--card:#fff;--ink:#14213d;--mut:#5b6b82;--line:#dde4ee;--blue:#0f8a5f;--green:#0f8a5f;--red:#d12f4b;--soft:#e6f5ee;--saf:#0f8a5f;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a15;--card:#10241d;--ink:#e8f5ef;--mut:#9dbfb1;--line:#25453a;--blue:#2fbf8a;--saf:#2fbf8a;--green:#3fd6a0;--red:#ff7c93;--soft:#15332a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b1a15;--card:#10241d;--ink:#e8f5ef;--mut:#9dbfb1;--line:#25453a;--blue:#2fbf8a;--saf:#2fbf8a;--green:#3fd6a0;--red:#ff7c93;--soft:#15332a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select{font:inherit}button,label{cursor:pointer}
+.wrap{max-width:1100px;margin:auto;padding:16px}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.brand b{font-size:19px;letter-spacing:1.5px}.brand b span{color:var(--saf)}.brand small{display:block;color:var(--mut);font-size:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;min-width:0}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:10px 14px;font-weight:650;font-size:14px;display:inline-block}
+.btn.pri{background:var(--saf);border-color:var(--saf);color:#fff}.btn.big{padding:13px 22px;font-size:16px}
+input,select{background:var(--card);border:1px solid var(--line);color:var(--ink);padding:9px 10px;border-radius:8px;max-width:100%}
+input[type=file]{display:none}:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.up{text-align:center;padding:28px 16px;border:2px dashed var(--line)}.up.drag{border-color:var(--saf);background:var(--soft)}
+.up h1{font-size:clamp(21px,4.5vw,30px);line-height:1.2;margin:0 0 8px}.up p{color:var(--mut);margin:6px auto;max-width:560px}
+.help,.status{font-size:12.5px;color:var(--mut)}.status{min-height:20px;margin-top:8px}.status.ok{color:var(--green)}.status.err{color:var(--red)}
+.bar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.tabs{display:flex;gap:6px;overflow-x:auto}.tab{border:1px solid var(--line);background:transparent;color:var(--mut);padding:9px 14px;border-radius:999px;white-space:nowrap;font-weight:600}
+.tab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.kpi small{color:var(--mut);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}.kpi b{display:block;font-size:clamp(18px,3vw,25px);margin:4px 0 0;overflow-wrap:anywhere}.kpi span{font-size:12px;color:var(--mut)}
+.g{color:var(--green)}.r{color:var(--red)}
+.two{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
+h2{font-size:16px;margin:0 0 10px}
+.tip{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}.tip:last-child{border:0}
+.mo{display:flex;gap:10px;align-items:flex-end;height:190px;overflow-x:auto;padding-bottom:4px}
+.mc{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:44px;height:100%}.mc span{font-size:11px;color:var(--mut);white-space:nowrap}
+.bars{flex:1;display:flex;align-items:flex-end;gap:3px}.bars i{width:16px;border-radius:4px 4px 0 0;min-height:2px}.bars .a{background:var(--green)}.bars .b{background:var(--red)}
+.lg{font-size:12px;color:var(--mut);margin-top:6px}.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 4px 0 10px}
+.hb{display:grid;grid-template-columns:110px 1fr auto;gap:8px;align-items:center;font-size:13px;margin:7px 0}
+.hb span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hb div{background:var(--soft);border-radius:6px;height:12px}.hb div i{display:block;height:100%;border-radius:6px;background:var(--saf)}
+.fr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.fr label{font-size:13px;color:var(--mut)}
+.mapg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}.mapg label{font-size:12px;color:var(--mut);display:grid;gap:3px}
+summary{cursor:pointer;font-weight:650}
+.tw{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:480px}table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}th{background:var(--soft);font-size:11px;text-transform:uppercase;position:sticky;top:0}
+.row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}.row b{text-align:right}.row.t{font-weight:800;font-size:16px;border:0}
+.note{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--mut)}
+.panel{display:none}.panel.on{display:block}
+footer{color:var(--mut);font-size:12px;padding:14px 0}
+@media(max-width:760px){.grid{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.hb{grid-template-columns:90px 1fr auto}}
+@media print{body{background:#fff;color:#000}.up,.bar,header .btn,#map,.noprint{display:none!important}.panel{display:block!important}#t-rec,#t-chk{display:none!important}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="brand"><b>DATA<span>SCOPE</span></b><small>Ledger &amp; bank statement workings for accountants and CAs</small></div><button class="btn" id="sample">Try sample data</button></header>
+
+<section class="card up" id="drop">
+ <h1>Bank statement &amp; ledger workings, in seconds</h1>
+ <p>Import a client’s bank statement or a Tally / Busy / Zoho ledger export. Get head-wise totals, GST workings and audit flags, then export to Excel. Client data stays on your device.</p>
+ <label class="btn pri big">Choose a file<input type="file" id="file" accept=".csv,.xlsx,.xls,.json"></label>
+ <p class="help">or drop it here · CSV · XLSX · XLS · JSON</p>
+ <div class="status" id="status" role="status" aria-live="polite"></div>
+</section>
+
+<main id="app" hidden>
+ <div class="bar">
+  <nav class="tabs"><button class="tab on" data-t="sum">Summary</button><button class="tab" data-t="gst">GST</button><button class="tab" data-t="rec">Ledger</button><button class="tab" data-t="chk">Audit checks</button></nav>
+  <div class="fr"><label>Period <select id="fy"></select></label></div>
+ </div>
+ <details class="card" id="map"><summary>Columns we detected — tap to correct</summary><div class="mapg" id="mapg"></div><label class="help" style="display:block;margin-top:10px">Ledger rules — one per line: keyword = Head (e.g. <code>swiggy = Staff welfare</code>). Applied before the built-in rules.<textarea id="rules" rows="3" style="width:100%;margin-top:4px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px"></textarea></label><button class="btn" id="applyR" style="margin-top:8px">Apply rules</button></details>
+
+ <section class="panel on" id="t-sum">
+  <div class="grid" id="kpis"></div>
+  <div class="card"><h2>Observations</h2><div id="tips"></div></div>
+  <div class="two">
+   <div class="card"><h2>Month by month</h2><div class="mo" id="months"></div><div class="lg"><i style="background:var(--green)"></i>Money in<i style="background:var(--red)"></i>Money out</div></div>
+   <div class="card"><h2>Head-wise totals</h2><div class="tw"><table><thead><tr><th>Head</th><th>Debit</th><th>Credit</th></tr></thead><tbody id="cats"></tbody></table></div></div>
+  </div>
+  <div class="fr noprint"><button class="btn" id="csv">Download clean CSV</button><button class="btn" id="print">Print / Save as PDF</button><button class="btn pri" id="xl">Export workings (Excel)</button></div>
+ </section>
+
+ <section class="panel" id="t-gst">
+  <div class="card">
+   <h2>GST estimate</h2>
+   <div class="fr">
+    <label>GST rate <select id="rate"><option>5</option><option>12</option><option selected>18</option><option>28</option><option>0</option></select></label>
+    <label>Amounts are <select id="incl"><option value="1">GST included</option><option value="0">Before GST</option></select></label>
+    <label>Sale type <select id="inter"><option value="0">Same state (CGST + SGST)</option><option value="1">Other state (IGST)</option></select></label>
+   </div>
+   <label class="fr" style="margin:10px 0"><input type="checkbox" id="exc" checked> Skip salaries, taxes, loans &amp; interest when counting GST you can claim</label>
+   <div id="gstOut"></div>
+   <p class="note">This is a quick estimate using one rate for all rows. Real GST depends on each invoice’s rate and exemptions — confirm with your CA before filing GSTR-1 / GSTR-3B.</p>
+  </div>
+  <div class="card"><h2>Check a GSTIN</h2><div class="fr"><input id="gstin" maxlength="15" placeholder="e.g. 27ABCDE1234F1Z5" style="text-transform:uppercase"><span id="gstinRes" class="help">Enter 15 characters</span></div></div>
+ </section>
+
+ <section class="panel" id="t-rec">
+  <div class="card"><div class="fr" style="margin-bottom:10px"><input id="q" type="search" placeholder="Search anything…" aria-label="Search"></div><div class="tw"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div><p class="help" id="tinfo"></p></div>
+ </section>
+
+ <section class="panel" id="t-chk"><div class="card" id="chk"></div></section>
+</main>
+<footer>DataScope · Your file is never uploaded. Excel support loads one library from the internet. Always check totals against your books.</footer>
+</div>
+
+<script>
+'use strict';
+let rows=[],heads=[],all=[],M={},unc=0,name='';
+const $=i=>document.getElementById(i);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const INR=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(n||0);
+const short=n=>{const a=Math.abs(n);return a>=1e7?'₹'+(n/1e7).toFixed(2)+' Cr':a>=1e5?'₹'+(n/1e5).toFixed(2)+' L':INR(n)};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const IN=/\b(income|credit|cr|receipt|received|sales?|inflow|deposit|revenue)\b/,OUT=/\b(expense|debit|dr|purchase|payment|paid|cost|outflow|withdrawal|withdraw)\b/;
+const EXC=/salar|wage|payroll|tax|gst|tds|loan|emi|interest/i;
+const KW=[[/salar|payroll|wage/,'Salaries'],[/rent/,'Rent'],[/gst|tds|itr|income tax|advance tax/,'Taxes & GST'],[/electric|bses|water|internet|airtel|jio|broadband|bill/,'Utilities'],[/fuel|petrol|diesel/,'Fuel'],[/ads|google|meta|facebook|market|advert/,'Marketing'],[/aws|software|subscription|saas|zoho|tally|busy/,'Software'],[/emi|loan|interest/,'Loan & interest'],[/travel|irctc|flight|uber|ola|hotel/,'Travel'],[/sale|invoice|inv\b|customer/,'Sales']];
+
+function say(m,t=''){$('status').textContent=m;$('status').className='status '+t}
+function num(v){if(typeof v==='number')return isFinite(v)?v:null;if(v==null)return null;let s=String(v).trim();if(!s)return null;const neg=/^\(.*\)$|^-/.test(s);s=s.replace(/[₹,\s()]|rs\.?|inr/gi,'').replace(/^[-+]/,'');if(!/^\d*\.?\d+$/.test(s))return null;return neg?-Number(s):Number(s)}
+function pd(v){if(v instanceof Date)return v;if(v==null||v==='')return null;
+ if(typeof v==='number'){if(v>20000&&v<80000){const t=new Date(Math.round((v-25569)*864e5));return new Date(t.getUTCFullYear(),t.getUTCMonth(),t.getUTCDate())}return null}
+ const s=String(v).trim();let m=s.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);if(m)return new Date(+m[1],m[2]-1,+m[3]);
+ m=s.match(/^(\d{1,2})[-\/. ](\d{1,2}|[A-Za-z]{3})[-\/. ,]*(\d{2,4})/);if(m){const mo=isNaN(m[2])?MON.findIndex(x=>x.toLowerCase()===m[2].toLowerCase()):m[2]-1;let y=+m[3];if(y<100)y+=2000;if(mo>=0&&mo<12)return new Date(y,mo,+m[1])}return null}
+const fmtD=d=>String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+const cell=v=>v instanceof Date?fmtD(new Date(v.getTime()+432e5)):(v==null?'':v);
+const fyOf=d=>d.getMonth()>=3?d.getFullYear():d.getFullYear()-1;
+
+function csvMatrix(t){t=t.replace(/^\uFEFF/,'');const o=[];let r=[],f='',q=false;
+ for(let i=0;i<t.length;i++){const c=t[i],n=t[i+1];
+  if(c==='"'){if(q&&n==='"'){f+='"';i++}else q=!q}
+  else if(c===','&&!q){r.push(f);f=''}
+  else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&n==='\n')i++;r.push(f);o.push(r);r=[];f=''}
+  else f+=c}
+ if(f||r.length){r.push(f);o.push(r)}return o}
+// Bank statements often have address/summary lines above the table — find the real header row
+function fromMatrix(m){m=m.filter(r=>r.some(c=>String(c??'').trim()!==''));
+ let hi=m.findIndex(r=>r.filter(c=>String(c??'').trim()).length>=3&&r.some(c=>/date|amount|debit|credit|narration|particular|description|withdraw|deposit/i.test(c)));if(hi<0)hi=0;
+ const hs=(m[hi]||[]).map((h,i)=>String(h??'').trim()||'Column '+(i+1));
+ return m.slice(hi+1).map(r=>Object.fromEntries(hs.map((h,i)=>[h,cell(r[i])])))}
+
+async function readFile(f){const ext=f.name.split('.').pop().toLowerCase();
+ if(ext==='csv')return fromMatrix(csvMatrix(await f.text()));
+ if(ext==='json'){const j=JSON.parse(await f.text());const a=Array.isArray(j)?j:j&&j.data;if(!Array.isArray(a))throw Error('JSON must be a list of records.');return a}
+ if(ext==='xlsx'||ext==='xls'){if(!window.XLSX)throw Error('Excel reader could not load. Please check your internet, or save the file as CSV.');
+  const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});return fromMatrix(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:true}))}
+ throw Error('Please choose a CSV, Excel (XLSX/XLS) or JSON file.')}
+
+function load(list,nm){list=(list||[]).filter(r=>r&&typeof r==='object'&&!Array.isArray(r));
+ if(!list.length)throw Error('No data rows found in this file.');
+ heads=[...new Set(list.flatMap(Object.keys))];rows=list.map(r=>Object.fromEntries(heads.map(h=>[h,r[h]??''])));name=nm;
+ detect();fillMap();buildTx();fillFY();$('app').hidden=false;render();say(`Loaded ${rows.length.toLocaleString('en-IN')} rows from ${nm}.`,'ok');
+ $('app').scrollIntoView({behavior:'smooth'})}
+
+function detect(){const f=re=>heads.find(h=>re.test(h))||'',samp=rows.slice(0,25),need=Math.max(1,Math.min(5,rows.length)*.7);
+ M={date:f(/date|\bdt\b/i),debit:f(/withdraw|debit|\bdr\b/i),credit:f(/deposit|credit|\bcr\b/i),type:f(/\btype\b|dr\/cr|cr\/dr|nature|direction|flow/i),cat:f(/categor|head|ledger|party|narration|description|particular|remark/i)};
+ M.bal=f(/balance/i);if(M.debit&&M.debit===M.credit){M.type=M.debit;M.debit=M.credit=''}
+ M.amount=(M.debit||M.credit)?'':heads.find(h=>/amount|amt|value|total/i.test(h)&&!/balance/i.test(h))||'';
+ if(!M.date)M.date=heads.find(h=>samp.filter(r=>pd(r[h])).length>=need)||'';
+ if(!M.amount&&!M.debit&&!M.credit)M.amount=heads.find(h=>h!==M.date&&samp.filter(r=>num(r[h])!==null).length>=need)||''}
+const LBL={date:'Date',amount:'Amount',debit:'Debit / Withdrawal',credit:'Credit / Deposit',type:'Type (Dr/Cr, Sale…)',cat:'Category / Narration',bal:'Running balance'};
+function fillMap(){$('mapg').innerHTML=Object.keys(LBL).map(k=>`<label>${LBL[k]}<select data-k="${k}"><option value="">— none —</option>${heads.map(h=>`<option value="${esc(h)}"${M[k]===h?' selected':''}>${esc(h)}</option>`).join('')}</select></label>`).join('');
+ $('mapg').querySelectorAll('select').forEach(s=>s.onchange=()=>{M[s.dataset.k]=s.value;buildTx();fillFY();render()})}
+
+function buildTx(){all=[];unc=0;const RULES=($('rules').value||'').split('\n').map(l=>l.split('=')).filter(p=>p.length==2&&p[0].trim()).map(p=>[p[0].trim().toLowerCase(),p[1].trim()]);const narr=M.cat&&!/categor|head|ledger/i.test(M.cat);
+ rows.forEach(r=>{let inn=0,out=0;
+  if(M.debit||M.credit){inn=Math.abs(num(r[M.credit])||0);out=Math.abs(num(r[M.debit])||0)}
+  else if(M.amount){const v=num(r[M.amount]);if(v!==null){const t=M.type?String(r[M.type]).toLowerCase():'';
+   if(IN.test(t))inn=Math.abs(v);else if(OUT.test(t))out=Math.abs(v);else if(!M.type){v>=0?inn=v:out=-v}}}
+  if(!inn&&!out){unc++;return}
+  let cat='Other',raw=M.cat?String(r[M.cat]??'').trim():'';
+  if(raw){const cr=RULES.find(x=>raw.toLowerCase().includes(x[0]));if(cr)cat=cr[1];else if(narr){const k=KW.find(x=>x[0].test(raw.toLowerCase()));cat=k?k[1]:'Other'}else cat=raw.slice(0,40)}
+  all.push({d:M.date?pd(r[M.date]):null,inn,out,cat,n:raw,r})})}
+function fillFY(){const c=$('fy').value,ys=[...new Set(all.filter(t=>t.d).map(t=>fyOf(t.d)))].sort().reverse();
+ $('fy').innerHTML='<option value="">All time</option>'+ys.map(y=>`<option value="${y}">FY ${y}-${String(y+1).slice(2)} (Apr–Mar)</option>`).join('');$('fy').value=ys.map(String).includes(c)?c:''}
+const view=()=>{const y=$('fy').value;return y?all.filter(t=>t.d&&fyOf(t.d)==y):all};
+
+function sumBy(v,key){const m=new Map();v.forEach(t=>{if(t[key]){m.set(t.cat,(m.get(t.cat)||0)+t[key])}});return[...m].sort((a,b)=>b[1]-a[1])}
+function render(){const v=view(),I=v.reduce((a,t)=>a+t.inn,0),O=v.reduce((a,t)=>a+t.out,0),N=I-O;
+ const k=(l,val,cl,sub)=>`<div class="card kpi"><small>${l}</small><b class="${cl}">${INR(val)}</b><span>${sub}</span></div>`;
+ $('kpis').innerHTML=k('Total credits',I,'g',short(I))+k('Total debits',O,'r',short(O))+k('Net (Cr − Dr)',N,N>=0?'g':'r',short(N))+`<div class="card kpi"><small>Transactions</small><b>${v.length.toLocaleString('en-IN')}</b><span>${unc?unc+' rows skipped':'All rows used'}</span></div>`;
+ // monthly
+ const mm=new Map();v.forEach(t=>{if(!t.d)return;const k=t.d.getFullYear()*100+t.d.getMonth(),e=mm.get(k)||{i:0,o:0};e.i+=t.inn;e.o+=t.out;mm.set(k,e)});
+ const ms=[...mm].sort((a,b)=>a[0]-b[0]).slice(-14),mx=Math.max(1,...ms.map(x=>Math.max(x[1].i,x[1].o)));
+ $('months').innerHTML=ms.length?ms.map(([k,e])=>`<div class="mc"><div class="bars"><i class="a" style="height:${e.i/mx*100}%" title="In ${INR(e.i)}"></i><i class="b" style="height:${e.o/mx*100}%" title="Out ${INR(e.o)}"></i></div><span>${MON[k%100]} ${String(Math.floor(k/100)).slice(2)}</span></div>`).join(''):'<p class="help">No valid dates found. Pick the Date column above.</p>';
+ const ex=sumBy(v,'out'),top=ex[0]?.[1]||1;
+ const hd=new Map();v.forEach(t=>{const e=hd.get(t.cat)||{i:0,o:0};e.i+=t.inn;e.o+=t.out;hd.set(t.cat,e)});$('cats').innerHTML=[...hd].sort((a,b)=>(b[1].i+b[1].o)-(a[1].i+a[1].o)).map(([c,e])=>`<tr><td>${esc(c)}</td><td>${e.o?INR(e.o):''}</td><td>${e.i?INR(e.i):''}</td></tr>`).join('')+`<tr><th>Total</th><th>${INR(O)}</th><th>${INR(I)}</th></tr>`;
+ // plain-English tips
+ const tips=[];if(I)tips.push(`Debits are ${(O/I*100).toFixed(1)}% of credits for the period.`);
+ if(ms.length>1){const b=[...ms].sort((a,c)=>(c[1].i-c[1].o)-(a[1].i-a[1].o));const f=x=>MON[x[0]%100]+' '+Math.floor(x[0]/100);tips.push(`📈 Best month: <b>${f(b[0])}</b> (${short(b[0][1].i-b[0][1].o)}). Weakest: <b>${f(b[b.length-1])}</b> (${short(b[b.length-1][1].i-b[b.length-1][1].o)}).`)}
+ if(ex[0]&&O)tips.push(`💸 Biggest expense: <b>${esc(ex[0][0])}</b> — ${(ex[0][1]/O*100).toFixed(0)}% of all spending.`);
+ const ti=sumBy(v,'inn');if(ti[0]&&I&&ti.length>1)tips.push(`🏷️ Top income source: <b>${esc(ti[0][0])}</b> (${(ti[0][1]/I*100).toFixed(0)}% of money in).`);
+ if(unc)tips.push(`ℹ️ ${unc} rows had no clear amount or Dr/Cr, so they were skipped. Check the “Columns we detected” box.`);
+ $('tips').innerHTML=tips.map(t=>`<div class="tip">${t}</div>`).join('')||'<p class="help">Nothing to summarise yet.</p>';
+ gst();recs();check()}
+
+function gst(){const r=+$('rate').value,incl=$('incl').value==='1',inter=$('inter').value==='1',ex=$('exc').checked,g=a=>incl?a*r/(100+r):a*r/100;
+ let sg=0,pg=0,sb=0,pb=0;view().forEach(t=>{if(t.inn){sg+=g(t.inn);sb+=t.inn}if(t.out&&!(ex&&EXC.test(t.cat))){pg+=g(t.out);pb+=t.out}});
+ const net=sg-pg,line=(l,x,c='')=>`<div class="row"><span>${l}</span><b class="${c}">${INR(x)}</b></div>`;
+ const split=a=>inter?line('IGST',a):line('CGST ('+r/2+'%)',a/2)+line('SGST ('+r/2+'%)',a/2);
+ $('gstOut').innerHTML=`<div class="row"><b style="text-align:left">GST you collected on sales</b><b></b></div>`+split(sg)+`<div class="row"><b style="text-align:left">GST you paid on purchases (claimable)</b><b></b></div>`+split(pg)+`<div class="row t"><span>${net>=0?'Estimated GST to pay':'Estimated credit carried forward'}</span><b class="${net>=0?'r':'g'}">${INR(Math.abs(net))}</b></div>`}
+['rate','incl','inter','exc'].forEach(i=>$(i).onchange=gst);
+$('gstin').oninput=e=>{const v=e.target.value.toUpperCase();e.target.value=v;$('gstinRes').textContent=!v?'Enter 15 characters':/^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(v)?'✓ Format looks valid (state code '+v.slice(0,2)+'). Verify on the GST portal.':'✗ Not a valid GSTIN format yet';$('gstinRes').style.color=/^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(v)?'var(--green)':'var(--mut)'};
+
+function recs(){const q=$('q').value.toLowerCase().trim(),f=rows.filter(r=>!q||heads.some(h=>String(r[h]).toLowerCase().includes(q)));
+ $('th').innerHTML='<tr>'+heads.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr>';
+ $('tb').innerHTML=f.slice(0,500).map(r=>'<tr>'+heads.map(h=>`<td>${esc(r[h])}</td>`).join('')+'</tr>').join('')||'<tr><td>No matches</td></tr>';
+ $('tinfo').textContent=`Showing ${Math.min(500,f.length)} of ${f.length.toLocaleString('en-IN')} rows`}
+$('q').oninput=recs;
+
+function dupKeys(){const s=new Set();let d=0;rows.forEach(r=>{const k=JSON.stringify(heads.map(h=>r[h]));s.has(k)?d++:s.add(k)});return d}
+function check(){const cells=rows.length*heads.length,miss=rows.reduce((a,r)=>a+heads.filter(h=>String(r[h]).trim()==='').length,0),d=dupKeys(),nd=all.filter(t=>!t.d).length;
+ const li=(ok,t)=>`<p>${ok?'✅':'⚠️'} ${t}</p>`;
+ $('chk').innerHTML=`<h2>Data check</h2><p><b>${rows.length.toLocaleString('en-IN')}</b> rows · <b>${heads.length}</b> columns</p>`+li(!miss,`<b>${miss.toLocaleString('en-IN')}</b> empty cells (${cells?((cells-miss)/cells*100).toFixed(1):100}% complete)`)+li(!d,`<b>${d}</b> exact duplicate rows`+(d?' <button class="btn" id="dd">Remove duplicates</button>':''))+li(!unc,`<b>${unc}</b> rows without a clear amount or Dr/Cr`)+li(!nd,`<b>${nd}</b> transactions without a readable date (dd/mm/yyyy works best)`)+flagHtml()+'<p class="help">Flags are prompts for review, not conclusions. Section references (40A(3), 269ST) apply only to the right party, mode and thresholds, so confirm each case.</p>';
+ const b=$('dd');if(b)b.onclick=()=>{const s=new Set();rows=rows.filter(r=>{const k=JSON.stringify(heads.map(h=>r[h]));return s.has(k)?false:(s.add(k),true)});buildTx();fillFY();render();say('Duplicates removed.','ok')}}
+
+function summaryText(){const v=view(),I=v.reduce((a,t)=>a+t.inn,0),O=v.reduce((a,t)=>a+t.out,0),e=sumBy(v,'out')[0],p=$('fy').selectedOptions[0].text;
+ return `📊 Business summary (${p})\nMoney in: ${short(I)}\nMoney out: ${short(O)}\n${I-O>=0?'Kept':'Shortfall'}: ${short(I-O)}${e?`\nBiggest expense: ${e[0]} (${short(e[1])})`:''}\n— made with DataScope`}
+async function saveFile(n,d){try{const dl=window.claude&&await window.claude.use('downloads');if(!dl)return say('Downloads are not available in this view.','err');await dl.save({filename:n,data:d});say('Saved '+n,'ok')}catch(e){if(!e||e.code!=='declined')say('Could not save the file.','err')}}
+const bnum=v=>{const s=String(v??'');const n=num(s.replace(/\s*(cr|dr)\.?$/i,''));return n!==null&&/dr\.?$/i.test(s)?-n:n};
+function flags(){const f=[],v=view(),A=v.map(t=>t.inn||t.out),L=A.length||1,mu=A.reduce((a,b)=>a+b,0)/L,sd=Math.sqrt(A.reduce((a,b)=>a+(b-mu)**2,0)/L),seen=new Set();let pb=null;
+ const add=(k,t)=>f.push({k,d:t.d?fmtD(t.d):'',a:t.inn||t.out,n:t.n||''});
+ v.forEach(t=>{const a=t.inn||t.out,n=String(t.n||'').toLowerCase();
+  if(/\bcash\b/.test(n)){if(t.out>10000)add('Cash payment above ₹10,000 — review s.40A(3)',t);if(t.inn>=200000)add('Cash receipt of ₹2 lakh or more — review s.269ST',t)}
+  if(a>=50000&&a%10000===0)add('Round amount (₹50,000+ in multiples of ₹10,000)',t);
+  if(t.d&&t.d.getDay()===0)add('Entry dated on a Sunday',t);
+  if(v.length>=10&&a>mu+3*sd)add('Unusually large vs. other entries',t);
+  const k=(t.d?t.d.getTime():'')+'|'+a+'|'+n;if(seen.has(k))add('Possible duplicate (same date, amount, narration)',t);else seen.add(k);
+  if(M.bal&&t.r){const b=bnum(t.r[M.bal]);if(b!==null&&pb!==null&&Math.abs(pb+t.inn-t.out-b)>0.5)add('Running balance does not tally',t);if(b!==null)pb=b}});return f}
+function flagHtml(){const f=flags(),g={};f.forEach(x=>(g[x.k]=g[x.k]||[]).push(x));return '<h2 style="margin-top:16px">Audit flags</h2>'+(f.length?Object.entries(g).map(([k,a])=>`<details><summary>${esc(k)} — ${a.length}</summary><div class="tw"><table><tbody>${a.slice(0,50).map(x=>`<tr><td>${x.d}</td><td>${INR(x.a)}</td><td>${esc(x.n)}</td></tr>`).join('')}</tbody></table></div></details>`).join(''):'<p>✅ No flags raised.</p>')}
+$('applyR').onclick=()=>{buildTx();fillFY();render();say('Ledger rules applied.','ok')};
+$('csv').onclick=()=>{const c=v=>{let s=String(v??'');if(/^[=+\-@\t\r]/.test(s))s="'"+s;return'"'+s.replace(/"/g,'""')+'"'};saveFile('datascope-clean.csv','\uFEFF'+[heads,...rows.map(r=>heads.map(h=>r[h]))].map(r=>r.map(c).join(',')).join('\r\n'))};
+$('xl').onclick=()=>{if(!window.XLSX)return say('Excel library did not load. Use the CSV export instead.','err');const v=view(),hd=new Map(),wb=XLSX.utils.book_new();
+ v.forEach(t=>{const e=hd.get(t.cat)||{Head:t.cat,Debit:0,Credit:0};e.Debit+=t.out;e.Credit+=t.inn;hd.set(t.cat,e)});
+ const add=(d,n)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(d.length?d:[{Note:'Nothing to report'}]),n);
+ add(v.map(t=>({Date:t.d?fmtD(t.d):'',Head:t.cat,Narration:t.n||'',Debit:t.out||'',Credit:t.inn||''})),'Transactions');add([...hd.values()],'Head-wise');add(flags().map(x=>({Flag:x.k,Date:x.d,Amount:x.a,Narration:x.n})),'Audit flags');
+ saveFile('datascope-workings.xlsx',XLSX.write(wb,{bookType:'xlsx',type:'array'}))};
+$('print').onclick=()=>window.print();
+$('csv').onclick=()=>{const c=v=>{let s=String(v??'');if(/^[=+\-@\t\r]/.test(s))s="'"+s;return'"'+s.replace(/"/g,'""')+'"'};
+ const u=URL.createObjectURL(new Blob(['\uFEFF'+[heads,...rows.map(r=>heads.map(h=>r[h]))].map(r=>r.map(c).join(',')).join('\r\n')],{type:'text/csv'})),a=document.createElement('a');a.href=u;a.download='datascope-clean.csv';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)};
+
+$('fy').onchange=render;
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='t-'+b.dataset.t))});
+$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{say('Reading file…');load(await readFile(f),f.name)}catch(x){say(x.message,'err')}e.target.value=''};
+const dz=$('drop');['dragenter','dragover'].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.add('drag')}));
+['dragleave','drop'].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.remove('drag')}));
+dz.addEventListener('drop',async e=>{const f=e.dataTransfer.files[0];if(!f)return;try{say('Reading file…');load(await readFile(f),f.name)}catch(x){say(x.message,'err')}});
+$('sample').onclick=()=>{const D=[['03/04/2026','Sale – Invoice 101','Credit','₹1,25,000'],['05/04/2026','Office rent','Debit','₹35,000'],['30/04/2026','Salary – April','Debit','₹68,000'],['12/05/2026','Sale – Invoice 102','Credit','₹2,10,000'],['18/05/2026','Google Ads','Debit','₹14,500'],['30/05/2026','Salary – May','Debit','₹68,000'],['10/06/2026','Sale – Invoice 103','Credit','₹1,80,000'],['15/06/2026','Electricity bill','Debit','₹6,200'],['20/07/2026','GST payment','Debit','₹22,000'],['25/07/2026','Sale – Invoice 104','Credit','₹3,40,000'],['09/08/2026','Zoho subscription','Debit','₹4,800'],['28/08/2026','Sale – Invoice 105','Credit','₹2,75,000'],['05/09/2026','Fuel','Debit','₹5,400'],['30/09/2026','Salary – September','Debit','₹72,000'],['14/10/2026','Sale – Invoice 106','Credit','₹4,10,000'],['02/11/2026','Office rent','Debit','₹35,000']];
+ load(D.map(r=>({Date:r[0],Narration:r[1],'Dr/Cr':r[2],Amount:r[3]})),'Sample-business-ledger.csv')};
+</script>
+</body>
+</html>
